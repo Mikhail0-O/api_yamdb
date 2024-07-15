@@ -9,7 +9,7 @@ class CategoriesViewSet(mixins.ListModelMixin,
                         mixins.CreateModelMixin,
                         mixins.DestroyModelMixin,
                         viewsets.GenericViewSet):
-    queryset = Categories.obgects.all()
+    queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
     # permission_classes = ('гость сморит всех. удалить и добавить - админ',)
     filter_backends = (filters.SearchFilter,)
