@@ -16,3 +16,14 @@ class Categories(models.Model):
     def __str__(self):
         return self.name
 
+
+class Genres(models.Model):
+    name = models.CharField('Название жанра', max_length=256)
+    slug = models.SlugField('Идентификатор', max_length=50, unique=True)
+
+    class Meta:
+        verbose_name = 'жанр'
+        verbose_name_plural = 'Жанры'
+
+    def __str__(self):
+        return self.name
