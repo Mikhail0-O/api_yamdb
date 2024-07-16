@@ -21,10 +21,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users.apps.UserConfig',
     'rest_framework',
     'reviews',
     'api',
-
 ]
 
 MIDDLEWARE = [
@@ -105,3 +105,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+
+# Кастомная модель пользователя
+AUTH_USER_MODEL = 'users.CustomUser'
