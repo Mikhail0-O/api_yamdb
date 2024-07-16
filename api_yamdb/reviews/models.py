@@ -65,12 +65,10 @@ class Titles(models.Model):
 
 class Reviews(models.Model):
     text = models.TextField('Текст отзыва')
-    score = models.IntegerField(
+    rating = models.IntegerField(
         'Рейтинг',
         choices=[(i, i) for i in range(1, 11)],  # Даем выбрать значение
-        default=None,
-        null=False,
-        blank=False
+        default=0
     )
     author = models.ForeignKey(
         CustomUser,
@@ -93,7 +91,7 @@ class Reviews(models.Model):
 
 
 class Comments(models.Model):
-    text = models.TextField('Текст комментария')
+    text = models.TextField('Текст комментария', max_length=500)
     author = models.ForeignKey(
         CustomUser,
         verbose_name='Автор комментария',
