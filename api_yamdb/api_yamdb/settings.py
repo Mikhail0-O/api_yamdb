@@ -108,3 +108,7 @@ STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 # Кастомная модель пользователя
 AUTH_USER_MODEL = 'users.CustomUser'
+
+MIN_RATING_VALUE = 1
+
+MAX_RATING_VALUE = 10
