@@ -1,28 +1,20 @@
-# модель пользователя
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
-class Role(models.Model):
-    title = models.CharField(
-        'Название', max_length=50, unique=True
-    )
-
-    class Meta:
-        verbose_name = 'роль'
-        verbose_name_plural = 'Роли'
-
-    def __str__(self):
-        return self.title
+def validate_role(value):
+    if value not in ['user', 'admin', 'moderator']:
+        raise ValidationError(f"{value} - недопустимая роль")
 
 
 class CustomUser(AbstractUser):
-
     bio = models.TextField('Биография', blank=True)
-    role = models.ForeignKey(
-        Role, on_delete=models.SET_NULL, null=True, blank=True
+    role = models.CharField(
+        max_length=50, blank=True, validators=[validate_role],
+        default='user'
     )
 
     class Meta:
-        verbose_name = 'пользователь'
+        verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
