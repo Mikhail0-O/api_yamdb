@@ -1,8 +1,7 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, mixins, permissions, serializers, viewsets
+from rest_framework import filters, mixins, serializers, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
-from .permissions import IsAuthorOrAdminOrModerator
 from reviews.models import Categories, Comments, Genres, Reviews, Titles
 from .serializers import (CategoriesSerializer,
                           CommentsSerializer,
@@ -45,7 +44,6 @@ class TitlesViewSet(viewsets.ModelViewSet):
 
 class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewsSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_title(self):
         return get_object_or_404(Titles, id=self.kwargs['title_id'])
@@ -59,9 +57,6 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 
 class CommentsViewSet(viewsets.ModelViewSet):
     serializer_class = CommentsSerializer
-    permission_classes = (
-        permissions.IsAuthenticatedOrReadOnly, IsAuthorOrAdminOrModerator
-    )
 
     def get_review(self):
         return get_object_or_404(Reviews, id=self.kwargs['review_id'])

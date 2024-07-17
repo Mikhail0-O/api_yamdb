@@ -1,5 +1,6 @@
-from django.db import models
+from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils import timezone
 
 from users.models import CustomUser
@@ -67,7 +68,9 @@ class Reviews(models.Model):
     text = models.TextField('Текст отзыва')
     rating = models.IntegerField(
         'Рейтинг',
-        choices=[(i, i) for i in range(1, 11)],  # Даем выбрать значение
+        choices=[(i, i) for i in range(
+            settings.MIN_RATING_VALUE, (settings.MAX_RATING_VALUE + 1)
+        )],  # Даем выбрать значение
         default=0
     )
     author = models.ForeignKey(
