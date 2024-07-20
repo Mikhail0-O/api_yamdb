@@ -9,7 +9,7 @@ from django.core.mail import send_mail
 from rest_framework.decorators import api_view
 
 from .serializers import UserRegistrationSerializer, UserSerializer
-from .refresh import get_tokens_for_user
+from .get_tokens_for_user import get_tokens_for_user
 from .confitmation_code import (generate_confirmation_code,
                                 store_confirmation_code,
                                 get_confirmation_code)
