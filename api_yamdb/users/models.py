@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator, MinLengthValidator
 
-from validators import validate_role, validate_username
+from .validators import validate_role, validate_username
 
 
 class CustomUser(AbstractUser):
