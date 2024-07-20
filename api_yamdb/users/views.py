@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view
 
 from .serializers import UserRegistrationSerializer, UserSerializer
 from .get_tokens_for_user import get_tokens_for_user
-from .confitmation_code import (generate_confirmation_code,
+from .confirmation_code import (generate_confirmation_code,
                                 store_confirmation_code,
                                 get_confirmation_code)
 
