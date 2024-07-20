@@ -118,7 +118,7 @@ CACHES = {
 
 # Internationalization
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -137,7 +137,10 @@ STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 # Кастомная модель пользователя
 AUTH_USER_MODEL = 'users.CustomUser'
-
 # Эмуляция почты
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
+
+MIN_RATING_VALUE = 1
+
+MAX_RATING_VALUE = 10
