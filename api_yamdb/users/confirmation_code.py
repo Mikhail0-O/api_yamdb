@@ -4,7 +4,7 @@ from django.core.cache import cache
 
 
 def store_confirmation_code(username, code):
-    cache.set(f'confirmation_code_{username}', code, timeout=3600)  # Хранение кода в течение 1 часа
+    cache.set(f'confirmation_code_{username}', code, timeout=3600)
 
 
 def get_confirmation_code(username):
