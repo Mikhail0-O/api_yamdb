@@ -1,10 +1,10 @@
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, serializers, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 from rest_framework import status
-from django_filters.rest_framework import DjangoFilterBackend
 
 from .mixins import GetTitleMixin, GetReviewMixin
 from reviews.models import Categories, Comments, Genres, Reviews, Titles
@@ -14,6 +14,7 @@ from .serializers import (CategoriesSerializer,
                           TitlesSerializer,
                           ReviewsSerializer)
 from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly
+from .filters import TitlesFilter
 
 
 class CategoriesViewSet(mixins.ListModelMixin,
@@ -26,6 +27,13 @@ class CategoriesViewSet(mixins.ListModelMixin,
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     permission_classes = [IsAdminOrReadOnly]
+
+    def get_object(self):
+        return get_object_or_404(Categories, slug=self.kwargs.get('slug'))
+
+    def destroy(self, request, *args, **kwargs):
+        self.perform_destroy(self.get_object())
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class GenresViewSet(mixins.ListModelMixin,
@@ -40,15 +48,22 @@ class GenresViewSet(mixins.ListModelMixin,
     search_fields = ('name',)
     permission_classes = [IsAdminOrReadOnly]
 
+    def get_object(self):
+        return get_object_or_404(Genres, slug=self.kwargs.get('slug'))
+
+    def destroy(self, request, *args, **kwargs):
+        self.perform_destroy(self.get_object())
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = [IsAdminOrReadOnly]
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
-    search_fields = ('name', 'year', 'genre', 'category')
-    filterset_fields = ('genre__slug',)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    search_fields = ('name', 'year', 'genre__name', 'category__name')
+    filterset_class = TitlesFilter
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':
