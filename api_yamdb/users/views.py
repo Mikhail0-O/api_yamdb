@@ -1,24 +1,22 @@
 from django.contrib.auth import get_user_model
 from rest_framework.mixins import CreateModelMixin
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import (GenericViewSet, ModelViewSet)
-from rest_framework.mixins import DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import status
 from django.core.mail import send_mail
 from rest_framework.decorators import api_view
-from rest_framework.generics import RetrieveUpdateAPIView, UpdateAPIView, DestroyAPIView, GenericAPIView, RetrieveUpdateDestroyAPIView
-from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
+from rest_framework.generics import (RetrieveUpdateAPIView,
+                                     RetrieveUpdateDestroyAPIView)
 from rest_framework import filters
 
-from .serializers import UserRegistrationSerializer, UserSerializer, UserMeSerializer
+from .serializers import (UserRegistrationSerializer, UserSerializer,
+                          UserMeSerializer)
 from .get_tokens_for_user import get_tokens_for_user
 from .confirmation_code import (generate_confirmation_code,
                                 store_confirmation_code,
                                 get_confirmation_code)
-from .permissions import IsAdminOnly
 
 
 User = get_user_model()
@@ -61,14 +59,6 @@ class UserDeleteViewSet(RetrieveUpdateDestroyAPIView):
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
         return Response(status=status.HTTP_403_FORBIDDEN)
-    # def _allowed_methods(self):
-    #     allowed_methods = [m.upper() for m in self.http_method_names if hasattr(self, m)]
-    #     allowed_methods.remove('PUT')
-    #     return allowed_methods
-
-    # def get_queryset(self):
-    #     queryset = User.objects.all()
-    #     return queryset
 
 
 class UserMeRetrieveUpdate(RetrieveUpdateAPIView):
@@ -106,16 +96,6 @@ class UserViewSet(ModelViewSet):
             return Response(serializer.data)
         return Response(status=status.HTTP_403_FORBIDDEN)
 
-    # def destroy(self, request, username=None, *args, **kwargs):
-    #     # Проверяем права доступа, если нужно
-    #     user = self.get_object()
-    #     if not request.user.is_superuser:
-    #         return Response({'detail': 'Недостаточно прав для удаления пользователя.'}, status=status.HTTP_403_FORBIDDEN)
-    #     user = get_object_or_404(User, username=username)
-    #     user.delete()
-    #     # self.perform_destroy(user)
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 @api_view(['POST'])
 def get_token(request):
@@ -133,7 +113,6 @@ def get_token(request):
             status=status.HTTP_404_NOT_FOUND
         )
     if confirmation_code == get_confirmation_code(username):
-        # print(get_tokens_for_user(User.objects.filter(username='Donald').first()).get('access'))
         return Response(get_tokens_for_user(user), status=status.HTTP_200_OK)
     return Response(
         {'detail': f'Код подтверждения {confirmation_code} - истек.'},
@@ -168,7 +147,6 @@ class CreateUserViewSet(CreateModelMixin, GenericViewSet):
             email=email
         ).exists()
         if user_exists:
-            print(get_confirmation_code(username))
             headers = self.get_success_headers(request.data)
             return Response(request.data, status=status.HTTP_200_OK)
         if email_exists:
@@ -183,7 +161,6 @@ class CreateUserViewSet(CreateModelMixin, GenericViewSet):
         headers = self.get_success_headers(serializer.data)
         confirmation_code = generate_confirmation_code()
         store_confirmation_code(username, confirmation_code)
-        print(get_confirmation_code(username))
         send_mail(
             subject='Код подтверждения',
             message=confirmation_code,

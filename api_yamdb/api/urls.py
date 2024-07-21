@@ -24,6 +24,7 @@ app_name = 'api'
 urlpatterns = [
     path('v1/auth/', include('users.urls')),
     path('v1/users/me/', UserMeRetrieveUpdate.as_view()),
-    path('v1/users/<str:username>/', UserDeleteViewSet.as_view(), name='user-delete'),
+    path('v1/users/<str:username>/',
+         UserDeleteViewSet.as_view(), name='user-delete'),
     path('v1/', include(v1_router.urls)),
 ]

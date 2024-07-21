@@ -13,8 +13,3 @@ def get_confirmation_code(username):
 
 def generate_confirmation_code():
     return str(uuid.uuid4())
-
-
-if __name__ == '__main__':
-    pass
-    # print(get_confirmation_code('Lenadi'))
