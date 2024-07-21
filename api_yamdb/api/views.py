@@ -4,6 +4,8 @@ from rest_framework import filters, mixins, serializers, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
+from rest_framework import status
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .mixins import GetTitleMixin, GetReviewMixin
 from reviews.models import Categories, Comments, Genres, Reviews, Titles
@@ -44,10 +46,10 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
     pagination_class = LimitOffsetPagination
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
-    filterset_fields = ('genre__slug',)
-    search_fields = ('name', 'year', 'genre__slug', 'category__slug')
     permission_classes = [IsAdminOrReadOnly]
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+    search_fields = ('name', 'year', 'genre', 'category')
+    filterset_fields = ('genre__slug',)
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':
@@ -56,6 +58,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
 
 
 class ReviewsViewSet(GetTitleMixin, viewsets.ModelViewSet):
+    queryset = Reviews.objects.all()
     serializer_class = ReviewsSerializer
     permission_classes = [IsAdminAuthorModeratorOrReadOnly]
 
@@ -77,3 +80,11 @@ class CommentsViewSet(GetReviewMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, review=self.get_review())
+
+    def update(self, request, *args, **kwargs):
+        if request.method == 'PUT':
+            raise MethodNotAllowed('PUT')
+        return super().update(request, *args, **kwargs)
+
+    # def put(self, request, *args, **kwargs):
+    #     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

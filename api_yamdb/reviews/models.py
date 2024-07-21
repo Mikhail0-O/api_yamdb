@@ -84,6 +84,8 @@ class Reviews(models.Model):
         related_name='reviews',
         verbose_name='Произведение',
         on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
@@ -105,7 +107,9 @@ class Comments(models.Model):
     review = models.ForeignKey(
         Reviews,
         verbose_name='Отзыв',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
