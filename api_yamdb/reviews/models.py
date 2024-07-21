@@ -76,7 +76,7 @@ class Reviews(models.Model):
     author = models.ForeignKey(
         CustomUser,
         verbose_name='Автор отзыва',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     title = models.ForeignKey(
         Titles,
@@ -91,9 +91,18 @@ class Reviews(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+        # unique_together = ('author', 'title')
 
     def __str__(self):
         return f'Отзыв на {self.title} от {self.author}'
+
+    # def clean(self):
+    #     # Проверка, существует ли уже отзыв этого пользователя на это произведение
+    #     if Reviews.objects.filter(
+    #             author=self.author,
+    #             title=self.title).exclude(id=self.id).exists():
+    #         raise ValidationError('Вы уже оставили отзыв на это произведение.')
+    #     super().clean()
 
 
 class Comments(models.Model):

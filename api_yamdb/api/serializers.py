@@ -19,7 +19,7 @@ class GenresSerializer(serializers.ModelSerializer):
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
-    author_username = serializers.CharField(
+    author = serializers.CharField(
         source='author.username',
         read_only=True
     )
@@ -27,19 +27,32 @@ class ReviewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reviews
         fields = (
-            'id', 'text', 'rating', 'author_username', 'title', 'pub_date'
+            'id', 'text', 'rating', 'author', 'title', 'pub_date'
         )
+
+    # def validate(self, data):
+    #     request = self.context.get('request')
+    #     title = data.get('title')
+    #     author = request.user
+
+    #     # Проверяем, существует ли уже отзыв от этого пользователя на это произведение
+    #     if Reviews.objects.filter(title=title, author=author).exists():
+    #         raise serializers.ValidationError(
+    #             'Вы уже оставили отзыв на это произведение.'
+    #         )
+
+    #     return data
 
 
 class CommentsSerializer(serializers.ModelSerializer):
-    author_username = serializers.CharField(
+    author = serializers.CharField(
         source='author.username',
         read_only=True
     )
 
     class Meta:
         model = Comments
-        fields = ('id', 'text', 'author_username', 'review', 'pub_date')
+        fields = ('id', 'text', 'author', 'review', 'pub_date')
 
 
 class TitlesSerializer(serializers.ModelSerializer):
@@ -67,6 +80,8 @@ class TitlesSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['category'] = CategoriesSerializer(
             instance.category).data
+        representation['genre'] = GenresSerializer(
+            instance.genre, many=True).data
         return representation
 
     class Meta:

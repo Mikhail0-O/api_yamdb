@@ -61,6 +61,20 @@ class ReviewsViewSet(GetTitleMixin, viewsets.ModelViewSet):
     serializer_class = ReviewsSerializer
     permission_classes = [IsAdminAuthorModeratorOrReadOnly]
 
+    # def create(self, request, *args, **kwargs):
+    #     author = request.user
+    #     title = self.get_title()
+
+    #     # Проверяем, существует ли уже отзыв от этого пользователя на это произведение
+    #     if Reviews.objects.filter(title=title, author=author).exists():
+    #         return Response(
+    #             {'detail': 'Вы уже оставили отзыв на это произведение!'},
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
+
+    #     # Если нет, вызываем метод create родительского класса
+    #     return super().create(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         author = self.request.user
         if Reviews.objects.filter(
@@ -68,6 +82,11 @@ class ReviewsViewSet(GetTitleMixin, viewsets.ModelViewSet):
         ).exists():
             raise serializers.ValidationError('Вы уже оставили отзыв!')
         serializer.save(author=author)
+
+    def update(self, request, *args, **kwargs):
+        if request.method == 'PUT':
+            raise MethodNotAllowed('PUT')
+        return super().update(request, *args, **kwargs)
 
 
 class CommentsViewSet(GetReviewMixin, viewsets.ModelViewSet):
