@@ -36,6 +36,7 @@ class Titles(models.Model):
     description = models.TextField('Описание произведения', blank=True)
     genre = models.ManyToManyField(
         Genres,
+        related_name='titles',
         verbose_name='Жанры',
     )
     category = models.ForeignKey(
@@ -82,7 +83,7 @@ class Reviews(models.Model):
         Titles,
         related_name='reviews',
         verbose_name='Произведение',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 

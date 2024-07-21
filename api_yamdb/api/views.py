@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, serializers, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.exceptions import MethodNotAllowed
@@ -43,8 +44,9 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name', 'year', 'genre', 'category')
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+    filterset_fields = ('genre__slug',)
+    search_fields = ('name', 'year', 'genre__slug', 'category__slug')
     permission_classes = [IsAdminOrReadOnly]
 
     def update(self, request, *args, **kwargs):

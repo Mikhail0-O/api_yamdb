@@ -67,6 +67,8 @@ class TitlesSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['category'] = CategoriesSerializer(
             instance.category).data
+        representation['genre'] = GenresSerializer(
+            instance.genre, many=True).data
         return representation
 
     class Meta:
