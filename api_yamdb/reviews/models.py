@@ -36,6 +36,7 @@ class Titles(models.Model):
     description = models.TextField('Описание произведения', blank=True)
     genre = models.ManyToManyField(
         Genres,
+        related_name='titles',
         verbose_name='Жанры',
     )
     category = models.ForeignKey(
