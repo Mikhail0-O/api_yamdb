@@ -51,7 +51,10 @@ class TitlesSerializer(serializers.ModelSerializer):
         queryset=Genres.objects.all()
     )
 
-    category = CategoriesSerializer()
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Categories.objects.all()
+    )
     reviews = ReviewsSerializer(many=True, read_only=True)
     comments = CommentsSerializer(many=True, read_only=True)
 
@@ -59,6 +62,12 @@ class TitlesSerializer(serializers.ModelSerializer):
         reviews = obj.reviews.all()
         if reviews.exists():
             return reviews.aggregate(Avg('rating'))['rating__avg']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['category'] = CategoriesSerializer(
+            instance.category).data
+        return representation
 
     class Meta:
         model = Titles

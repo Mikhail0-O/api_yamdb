@@ -6,7 +6,7 @@ from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 
 from reviews.models import Titles, Genres, Categories, Reviews, Comments
-from users.models import CustomUser, Role
+from users.models import CustomUser
 
 
 class Command(BaseCommand):
@@ -97,16 +97,11 @@ class Command(BaseCommand):
         with open(file_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                try:
-                    role = Role.objects.get(title=row['role'])
-                except ObjectDoesNotExist:
-                    # Если роль не существует, создаем её
-                    role = Role.objects.create(title=row['role'])
                 CustomUser.objects.create_user(
                     id=int(row['id']),
                     username=row['username'],
                     email=row['email'],
-                    role=role,
+                    role=row['role'],
                     bio=row.get('bio', ''),
                     first_name=row.get('first_name', ''),
                     last_name=row.get('last_name', '')
