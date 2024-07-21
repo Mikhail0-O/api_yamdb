@@ -15,7 +15,7 @@ class TitlesAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        queryset = queryset.annotate(average_rating=Avg('reviews__rating'))
+        queryset = queryset.annotate(average_rating=Avg('reviews__score'))
         return queryset
 
     def average_rating(self, obj):
@@ -42,10 +42,10 @@ class CommentsAdmin(admin.ModelAdmin):
 
 
 class ReviewsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'text', 'author', 'rating', 'title', 'pub_date')
-    search_fields = ('id', 'text', 'rating', 'pub_date', 'title__name')
-    list_filter = ('pub_date', 'rating', 'author')
-    list_editable = ('rating', 'text')
+    list_display = ('id', 'text', 'author', 'score', 'title', 'pub_date')
+    search_fields = ('id', 'text', 'score', 'pub_date', 'title__name')
+    list_filter = ('pub_date', 'score', 'author')
+    list_editable = ('score', 'text')
 
 
 admin.site.register(Titles, TitlesAdmin)

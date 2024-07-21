@@ -27,7 +27,7 @@ class ReviewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reviews
         fields = (
-            'id', 'text', 'rating', 'author', 'title', 'pub_date'
+            'id', 'text', 'score', 'author', 'title', 'pub_date'
         )
 
     # def validate(self, data):
@@ -74,7 +74,7 @@ class TitlesSerializer(serializers.ModelSerializer):
     def get_rating(self, obj):
         reviews = obj.reviews.all()
         if reviews.exists():
-            return reviews.aggregate(Avg('rating'))['rating__avg']
+            return reviews.aggregate(Avg('score'))['score__avg']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

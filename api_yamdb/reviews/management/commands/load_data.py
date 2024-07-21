@@ -118,7 +118,7 @@ class Command(BaseCommand):
                     title=title,
                     text=row['text'],
                     author=user,
-                    rating=int(row['score']),
+                    score=int(row['score']),
                     pub_date=row['pub_date']
                 )
 

@@ -66,7 +66,7 @@ class Titles(models.Model):
 
 class Reviews(models.Model):
     text = models.TextField('Текст отзыва')
-    rating = models.IntegerField(
+    score = models.IntegerField(
         'Рейтинг',
         choices=[(i, i) for i in range(
             settings.MIN_RATING_VALUE, (settings.MAX_RATING_VALUE + 1)
