@@ -43,6 +43,7 @@ class CommentsSerializer(serializers.ModelSerializer):
 
 
 class TitlesSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=256)
     rating = serializers.SerializerMethodField()
     genre = serializers.SlugRelatedField(
         many=True,
@@ -50,10 +51,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         queryset=Genres.objects.all()
     )
 
-    category = serializers.SlugRelatedField(
-        slug_field='slug',
-        queryset=Categories.objects.all()
-    )
+    category = CategoriesSerializer()
     reviews = ReviewsSerializer(many=True, read_only=True)
     comments = CommentsSerializer(many=True, read_only=True)
 

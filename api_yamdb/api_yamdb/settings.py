@@ -1,4 +1,5 @@
 from pathlib import Path
+import tempfile
 from datetime import timedelta
 
 
@@ -113,6 +114,7 @@ CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
         "LOCATION": BASE_DIR / "cache",
+
     }
 }
 
