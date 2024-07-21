@@ -28,6 +28,13 @@ class CategoriesViewSet(mixins.ListModelMixin,
     search_fields = ('name',)
     permission_classes = [IsAdminOrReadOnly]
 
+    def get_object(self):
+        return get_object_or_404(Genres, slug=self.kwargs.get('slug'))
+
+    def destroy(self, request, *args, **kwargs):
+        self.perform_destroy(self.get_object())
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class GenresViewSet(mixins.ListModelMixin,
                     mixins.CreateModelMixin,
@@ -41,6 +48,13 @@ class GenresViewSet(mixins.ListModelMixin,
     search_fields = ('name',)
     permission_classes = [IsAdminOrReadOnly]
 
+    def get_object(self):
+        return get_object_or_404(Categories, slug=self.kwargs.get('slug'))
+
+    def destroy(self, request, *args, **kwargs):
+        self.perform_destroy(self.get_object())
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
@@ -50,6 +64,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     search_fields = ('name', 'year', 'genre', 'category')
     filterset_fields = ('genre__slug',)
+
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':

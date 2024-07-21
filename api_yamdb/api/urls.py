@@ -7,7 +7,7 @@ from users.views import UserViewSet, UserMeRetrieveUpdate, UserDeleteViewSet
 
 
 v1_router = routers.DefaultRouter()
-v1_router.register('categories', CategoriesViewSet)
+v1_router.register('categories', CategoriesViewSet, basename='categories')
 v1_router.register('genres', GenresViewSet)
 v1_router.register('titles', TitlesViewSet)
 v1_router.register(
