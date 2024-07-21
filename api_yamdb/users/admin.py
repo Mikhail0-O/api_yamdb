@@ -6,4 +6,5 @@ from .models import CustomUser
 UserAdmin.fieldsets += (
     ('Extra Fields', {'fields': ('bio', 'role')}),
 )
+
 admin.site.register(CustomUser, UserAdmin)
