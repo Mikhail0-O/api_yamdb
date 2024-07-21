@@ -1,7 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, serializers, viewsets
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from .mixins import GetTitleMixin, GetReviewMixin
 from reviews.models import Categories, Comments, Genres, Reviews, Titles
