@@ -1,4 +1,5 @@
 from pathlib import Path
+import tempfile
 from datetime import timedelta
 
 
@@ -112,7 +113,7 @@ SIMPLE_JWT = {
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-        "LOCATION": "C:/Users/HP/Dev/api_yamdb/cache",
+        "LOCATION": BASE_DIR / 'cache',
     }
 }
 

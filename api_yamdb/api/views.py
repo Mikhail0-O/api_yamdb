@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, serializers, viewsets
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.response import Response
 
 from .mixins import GetTitleMixin, GetReviewMixin
 from reviews.models import Categories, Comments, Genres, Reviews, Titles
@@ -24,12 +26,11 @@ class CategoriesViewSet(mixins.ListModelMixin,
     permission_classes = [IsAdminOrReadOnly]
 
 
-class GenresViewSet(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
+class GenresViewSet(mixins.ListModelMixin,
+                    mixins.CreateModelMixin,
+                    mixins.DestroyModelMixin,
+                    viewsets.GenericViewSet
+                    ):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
     pagination_class = LimitOffsetPagination
@@ -45,6 +46,11 @@ class TitlesViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', 'year', 'genre', 'category')
     permission_classes = [IsAdminOrReadOnly]
+
+    def update(self, request, *args, **kwargs):
+        if request.method == 'PUT':
+            raise MethodNotAllowed('PUT')
+        return super().update(request, *args, **kwargs)
 
 
 class ReviewsViewSet(GetTitleMixin, viewsets.ModelViewSet):
