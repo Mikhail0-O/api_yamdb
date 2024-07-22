@@ -68,7 +68,7 @@ class Review(models.Model):
     text = models.TextField('Текст отзыва')
     score = models.IntegerField(
         'Рейтинг',
-        choices=[(i, i) for i in range(settings.MIN_RATING_VALUE, (settings.MAX_RATING_VALUE + 1))],
+        choices=[(i, i) for i in range(1, 11)],  # Пример выбора рейтинга от 1 до 10
         default=0
     )
     author = models.ForeignKey(
@@ -96,9 +96,17 @@ class Review(models.Model):
     def __str__(self):
         return f'Отзыв на {self.title} от {self.author}'
 
-    def save(self, *args, **kwargs):
+    def clean(self):
+        super().clean()
         if Review.objects.filter(author=self.author, title=self.title).exclude(id=self.id).exists():
-            raise IntegrityError('Вы уже оставили отзыв на это произведение.')
+            raise ValidationError('Вы уже оставили отзыв на это произведение.')
+
+    def save(self, *args, **kwargs):
+        # Переопределяем save, чтобы включить проверку уникальности
+        try:
+            self.clean()  # Проверяем уникальность и другие ограничения
+        except ValidationError as e:
+            raise ValidationError(str(e))
         super().save(*args, **kwargs)
 
 
