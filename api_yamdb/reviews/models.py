@@ -68,7 +68,8 @@ class Review(models.Model):
     text = models.TextField('Текст отзыва')
     score = models.IntegerField(
         'Рейтинг',
-        choices=[(i, i) for i in range(1, 11)],  # Пример выбора рейтинга от 1 до 10
+        choices=[(i, i) for i in range(settings.MIN_SCORE_VALUE,
+                                       settings.MAX_SCORE_VALUE)],
         default=0
     )
     author = models.ForeignKey(

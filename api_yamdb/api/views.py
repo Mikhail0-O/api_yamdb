@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, serializers, viewsets
+from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
@@ -77,8 +77,7 @@ class ReviewsViewSet(GetTitleMixin, viewsets.ModelViewSet):
     permission_classes = [IsAdminAuthorModeratorOrReadOnly]
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        serializer.save(author=self.request.user, title=title)
+        serializer.save(author=self.request.user, title=self.get_title())
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':
