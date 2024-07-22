@@ -1,7 +1,7 @@
 from django.db.models import Avg
 from rest_framework import serializers
 
-from reviews.models import Categories, Comments, Genres, Reviews, Titles
+from reviews.models import Categories, Comments, Genres, Review, Title
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -25,23 +25,24 @@ class ReviewsSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Reviews
-        fields = (
-            'id', 'text', 'score', 'author', 'title', 'pub_date'
-        )
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
 
-    # def validate(self, data):
-    #     request = self.context.get('request')
-    #     title = data.get('title')
-    #     author = request.user
+    def validate(self, data):
+        request = self.context.get('request')
+        user = request.user if request else None
+        title = data.get('title')
 
-    #     # Проверяем, существует ли уже отзыв от этого пользователя на это произведение
-    #     if Reviews.objects.filter(title=title, author=author).exists():
-    #         raise serializers.ValidationError(
-    #             'Вы уже оставили отзыв на это произведение.'
-    #         )
-
-    #     return data
+        if Review.objects.filter(
+                author=user,
+                title=title
+        ).exclude(
+            id=self.instance.id if self.instance else None
+        ).exists():
+            raise serializers.ValidationError(
+                'Вы уже оставили отзыв на это произведение.'
+            )
+        return data
 
 
 class CommentsSerializer(serializers.ModelSerializer):
@@ -75,6 +76,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         reviews = obj.reviews.all()
         if reviews.exists():
             return reviews.aggregate(Avg('score'))['score__avg']
+        return None
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -85,7 +87,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         return representation
 
     class Meta:
-        model = Titles
+        model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description',
             'genre', 'category', 'reviews', 'comments'

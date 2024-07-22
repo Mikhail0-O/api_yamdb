@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models import Avg
 
-from .models import Categories, Comments, Genres, Titles, Reviews
+from .models import Categories, Comments, Genres, Title, Review
 
 
 class TitlesAdmin(admin.ModelAdmin):
@@ -48,8 +48,8 @@ class ReviewsAdmin(admin.ModelAdmin):
     list_editable = ('score', 'text')
 
 
-admin.site.register(Titles, TitlesAdmin)
+admin.site.register(Title, TitlesAdmin)
 admin.site.register(Genres)
 admin.site.register(Categories)
 admin.site.register(Comments, CommentsAdmin)
-admin.site.register(Reviews, ReviewsAdmin)
+admin.site.register(Review, ReviewsAdmin)

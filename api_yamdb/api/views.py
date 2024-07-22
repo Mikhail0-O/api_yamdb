@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .mixins import GetTitleMixin, GetReviewMixin
-from reviews.models import Categories, Comments, Genres, Reviews, Titles
+from reviews.models import Categories, Comments, Genres, Review, Title
 from .serializers import (CategoriesSerializer,
                           CommentsSerializer,
                           GenresSerializer,
@@ -57,7 +57,7 @@ class GenresViewSet(mixins.ListModelMixin,
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Titles.objects.all()
+    queryset = Title.objects.all()
     serializer_class = TitlesSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = [IsAdminOrReadOnly]
@@ -72,31 +72,12 @@ class TitlesViewSet(viewsets.ModelViewSet):
 
 
 class ReviewsViewSet(GetTitleMixin, viewsets.ModelViewSet):
-    queryset = Reviews.objects.all()
+    queryset = Review.objects.all()
     serializer_class = ReviewsSerializer
     permission_classes = [IsAdminAuthorModeratorOrReadOnly]
 
-    # def create(self, request, *args, **kwargs):
-    #     author = request.user
-    #     title = self.get_title()
-
-    #     # Проверяем, существует ли уже отзыв от этого пользователя на это произведение
-    #     if Reviews.objects.filter(title=title, author=author).exists():
-    #         return Response(
-    #             {'detail': 'Вы уже оставили отзыв на это произведение!'},
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         )
-
-    #     # Если нет, вызываем метод create родительского класса
-    #     return super().create(request, *args, **kwargs)
-
     def perform_create(self, serializer):
-        author = self.request.user
-        if Reviews.objects.filter(
-            title=self.get_title(), author=author
-        ).exists():
-            raise serializers.ValidationError('Вы уже оставили отзыв!')
-        serializer.save(author=author)
+        serializer.save(author=self.request.user)
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':
@@ -118,6 +99,3 @@ class CommentsViewSet(GetReviewMixin, viewsets.ModelViewSet):
         if request.method == 'PUT':
             raise MethodNotAllowed('PUT')
         return super().update(request, *args, **kwargs)
-
-    # def put(self, request, *args, **kwargs):
-    #     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
