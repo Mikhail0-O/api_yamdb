@@ -26,21 +26,22 @@ class ReviewsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        fields = ('id', 'text', 'author', 'score', 'pub_date')  # Удалите 'title' из полей
+        read_only_fields = ('pub_date', 'author')  # Сделайте 'pub_date' и 'author' только для чтения
 
     def validate(self, data):
         request = self.context.get('request')
-        user = request.user if request else None
-        title = data.get('title')
+        user = request.user
+        title_id = self.context['view'].kwargs.get('title_id')
 
         if Review.objects.filter(
                 author=user,
-                title=title
+                title__id=title_id
         ).exclude(
             id=self.instance.id if self.instance else None
         ).exists():
             raise serializers.ValidationError(
-                'Вы уже оставили отзыв на это произведение.'
+                'Вы уже оставляли отзыв на это произведение.'
             )
         return data
 

@@ -82,7 +82,6 @@ class Review(models.Model):
         related_name='reviews',
         verbose_name='Произведение',
         on_delete=models.CASCADE,
-        null=True,
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
@@ -90,24 +89,14 @@ class Review(models.Model):
         verbose_name = 'отзыв'
         verbose_name_plural = 'Отзывы'
         constraints = [
-            models.UniqueConstraint(fields=['author', 'title'], name='unique_review')
+            models.UniqueConstraint(
+                fields=['author', 'title'],
+                name='unique_review'
+            ),
         ]
 
     def __str__(self):
         return f'Отзыв на {self.title} от {self.author}'
-
-    def clean(self):
-        super().clean()
-        if Review.objects.filter(author=self.author, title=self.title).exclude(id=self.id).exists():
-            raise ValidationError('Вы уже оставили отзыв на это произведение.')
-
-    def save(self, *args, **kwargs):
-        # Переопределяем save, чтобы включить проверку уникальности
-        try:
-            self.clean()  # Проверяем уникальность и другие ограничения
-        except ValidationError as e:
-            raise ValidationError(str(e))
-        super().save(*args, **kwargs)
 
 
 class Comments(models.Model):
