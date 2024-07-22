@@ -3,7 +3,6 @@ import csv
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django.core.exceptions import ObjectDoesNotExist
 
 from reviews.models import Title, Genres, Categories, Review, Comments
 from users.models import CustomUser
