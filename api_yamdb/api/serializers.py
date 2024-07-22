@@ -1,7 +1,7 @@
 from django.db.models import Avg
 from rest_framework import serializers
 
-from reviews.models import Categories, Comments, Genres, Reviews, Titles
+from reviews.models import Categories, Comments, Genres, Review, Title
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -19,27 +19,41 @@ class GenresSerializer(serializers.ModelSerializer):
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
-    author_username = serializers.CharField(
+    author = serializers.CharField(
         source='author.username',
         read_only=True
     )
 
     class Meta:
-        model = Reviews
-        fields = (
-            'id', 'text', 'rating', 'author_username', 'title', 'pub_date'
-        )
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        read_only_fields = ('pub_date', 'author')
+
+    def validate(self, data):
+        if self.context['request'].method != 'POST':
+            return data
+
+        if Review.objects.filter(
+                author=self.context.get('request').user,
+                title__id=self.context['view'].kwargs.get('title_id')
+        ).exclude(
+            id=self.instance.id if self.instance else None
+        ).exists():
+            raise serializers.ValidationError(
+                'Вы уже оставляли отзыв на это произведение.'
+            )
+        return data
 
 
 class CommentsSerializer(serializers.ModelSerializer):
-    author_username = serializers.CharField(
+    author = serializers.CharField(
         source='author.username',
         read_only=True
     )
 
     class Meta:
         model = Comments
-        fields = ('id', 'text', 'author_username', 'review', 'pub_date')
+        fields = ('id', 'text', 'author', 'review', 'pub_date')
 
 
 class TitlesSerializer(serializers.ModelSerializer):
@@ -61,16 +75,19 @@ class TitlesSerializer(serializers.ModelSerializer):
     def get_rating(self, obj):
         reviews = obj.reviews.all()
         if reviews.exists():
-            return reviews.aggregate(Avg('rating'))['rating__avg']
+            return reviews.aggregate(Avg('score'))['score__avg']
+        return None
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['category'] = CategoriesSerializer(
             instance.category).data
+        representation['genre'] = GenresSerializer(
+            instance.genre, many=True).data
         return representation
 
     class Meta:
-        model = Titles
+        model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description',
             'genre', 'category', 'reviews', 'comments'

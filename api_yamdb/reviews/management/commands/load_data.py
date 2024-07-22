@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 
-from reviews.models import Titles, Genres, Categories, Reviews, Comments
+from reviews.models import Title, Genres, Categories, Review, Comments
 from users.models import CustomUser
 
 
@@ -73,7 +73,7 @@ class Command(BaseCommand):
             reader = csv.DictReader(csvfile)
             for row in reader:
                 category = Categories.objects.get(id=int(row['category']))
-                title = Titles.objects.create(
+                title = Title.objects.create(
                     id=int(row['id']),
                     name=row['name'],
                     year=int(row['year']),
@@ -89,7 +89,7 @@ class Command(BaseCommand):
         with open(file_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                title = Titles.objects.get(id=int(row['title_id']))
+                title = Title.objects.get(id=int(row['title_id']))
                 genre = Genres.objects.get(id=int(row['genre_id']))
                 title.genre.add(genre)
 
@@ -111,14 +111,14 @@ class Command(BaseCommand):
         with open(file_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                title = Titles.objects.get(id=int(row['title_id']))
+                title = Title.objects.get(id=int(row['title_id']))
                 user = CustomUser.objects.get(id=int(row['author']))
-                Reviews.objects.create(
+                Review.objects.create(
                     id=int(row['id']),
                     title=title,
                     text=row['text'],
                     author=user,
-                    rating=int(row['score']),
+                    score=int(row['score']),
                     pub_date=row['pub_date']
                 )
 
@@ -126,7 +126,7 @@ class Command(BaseCommand):
         with open(file_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                review = Reviews.objects.get(id=int(row['review_id']))
+                review = Review.objects.get(id=int(row['review_id']))
                 user = CustomUser.objects.get(id=int(row['author']))
                 Comments.objects.create(
                     id=int(row['id']),
