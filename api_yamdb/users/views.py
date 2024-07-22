@@ -165,7 +165,7 @@ class CreateUserViewSet(CreateModelMixin, GenericViewSet):
             subject='Код подтверждения',
             message=confirmation_code,
             from_email='from@example.com',
-            recipient_list=[request.data['email'],],
+            recipient_list=[request.data['email'], ],
             fail_silently=True,
         )
         return Response(

@@ -12,15 +12,16 @@ class IsAdminAuthorModeratorOrReadOnly(permissions.BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
-        return (request.method in permissions.SAFE_METHODS
-                or (request.method == 'PATCH'
-                    and (request.user.role == 'moderator'
-                         or request.user.role == 'admin'
-                         or obj.author == request.user))
-                or (request.method == 'DELETE'
-                    and (request.user.role == 'moderator'
-                         or request.user.role == 'admin'
-                         or obj.author == request.user))
+        return (
+            request.method in permissions.SAFE_METHODS
+            or (request.method == 'PATCH'
+                and (request.user.role == 'moderator'
+                     or request.user.role == 'admin'
+                     or obj.author == request.user))
+            or (request.method == 'DELETE'
+                and (request.user.role == 'moderator'
+                     or request.user.role == 'admin'
+                     or obj.author == request.user))
         )
 
 
