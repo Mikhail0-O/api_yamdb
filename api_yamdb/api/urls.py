@@ -3,8 +3,7 @@ from django.urls import include, path
 
 from .views import (CategoriesViewSet, GenresViewSet, TitlesViewSet,
                     ReviewsViewSet, CommentsViewSet)
-# from users.views import UserViewSet, UserMeRetrieveUpdate, UserDeleteViewSet
-from users.views import UserViewSet, UserRegistrationViewSet, get_token
+from .views import UserViewSet, UserRegistrationViewSet, get_token
 
 v1_router = routers.DefaultRouter()
 v1_router.register('titles', TitlesViewSet, basename='titles')
@@ -22,12 +21,6 @@ app_name = 'api'
 
 urlpatterns = [
     path('v1/auth/token/', get_token),
-    # path('v1/auth/', include('users.urls')),
-    # path('v1/users/me/', UserViewSet.as_view()),
-    # path(
-    #     'v1/users/<str:username>/',
-    #     UserViewSet.as_view(), name='user-delete'
-    # ),
     path('v1/categories/<slug:slug>/',
          CategoriesViewSet.as_view({'delete': 'destroy'}),
          name='category-detail'),
