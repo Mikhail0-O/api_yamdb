@@ -156,3 +156,4 @@ MIN_SCORE_VALUE = 1
 MAX_SCORE_VALUE = 11
 
 VALID_USERNAME_CHARECTERS = r'^[\w.@+-]+\Z'
+ADMIN_EMAIL = 'from@example.com'

@@ -103,15 +103,6 @@ class TitlesSerializer(serializers.ModelSerializer):
         )
 
 
-class UserMeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = (
-            'username', 'email', 'first_name', 'last_name', 'bio', 'role'
-        )
-        read_only_fields = ('role',)
-
-
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -119,6 +110,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role'
         )
+
+
+class UserMeSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
+        read_only_fields = ('role',)
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):

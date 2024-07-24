@@ -20,7 +20,7 @@ v1_router.register(r'auth/signup', UserRegistrationViewSet, basename='auth')
 app_name = 'api'
 
 urlpatterns = [
-    path('v1/auth/token/', get_token),
+    path('v1/auth/token/', get_token, name='token'),
     path('v1/categories/<slug:slug>/',
          CategoriesViewSet.as_view({'delete': 'destroy'}),
          name='category-detail'),

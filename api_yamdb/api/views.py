@@ -14,6 +14,7 @@ from rest_framework.exceptions import MethodNotAllowed
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from api_yamdb.settings import ADMIN_EMAIL
 from .mixins import GetTitleMixin, GetReviewMixin
 from reviews.models import Categories, Comments, Genres, Review, Title
 from .serializers import (CategoriesSerializer,
@@ -140,7 +141,7 @@ class UserRegistrationViewSet(ModelViewSet):
         send_mail(
             subject='Код подтверждения',
             message=confirmation_code,
-            from_email='from@example.com',
+            from_email=ADMIN_EMAIL,
             recipient_list=[email],
             fail_silently=True,
         )
