@@ -1,13 +1,13 @@
 from django.contrib import admin
 from django.db.models import Avg
 
-from .models import Categories, Comments, Genres, Title, Review
+from .models import Category, Comment, Genre, Title, Review
 
 
 class TitlesAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'name', 'year', 'description', 'category',
-        'average_rating', 'genres'
+        'average_rating', 'genre_list'
     )
     search_fields = ('name', 'year', 'category__name')
     list_filter = ('year', 'category', 'genre')
@@ -28,13 +28,13 @@ class TitlesAdmin(admin.ModelAdmin):
     average_rating.short_description = 'Average Rating'
     average_rating.admin_order_field = 'average_rating'
 
-    def genres(self, obj):
-        return ", ".join([genre.name for genre in obj.genre.all()])
+    def genre_list(self, obj):
+        return ", ".join(obj.genre.values_list('name', flat=True))
 
-    genres.short_description = 'Genres'
+    genre_list.short_description = 'Genre'
 
 
-class CommentsAdmin(admin.ModelAdmin):
+class CommentAdmin(admin.ModelAdmin):
     list_display = ('id', 'text', 'author', 'review', 'pub_date')
     search_fields = ('id', 'author__username', 'review__text', 'pub_date')
     list_filter = ('pub_date', 'author')
@@ -49,7 +49,7 @@ class ReviewsAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Title, TitlesAdmin)
-admin.site.register(Genres)
-admin.site.register(Categories)
-admin.site.register(Comments, CommentsAdmin)
+admin.site.register(Genre)
+admin.site.register(Category)
+admin.site.register(Comment, CommentAdmin)
 admin.site.register(Review, ReviewsAdmin)

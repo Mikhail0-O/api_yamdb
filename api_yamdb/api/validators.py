@@ -1,13 +1,8 @@
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
-def validate_role(value):
-    if value not in ['user', 'admin', 'moderator']:
-        raise ValidationError(f"{value} - недопустимая роль")
-
-
-def validate_username(value):
-    if value == 'me':
-        raise ValidationError(
-            f"Использовать имя '{value}' в качестве username запрещено"
-        )
+def year_validator(value):
+    """Валидатор для проверки года выхода произведения"""
+    if value > timezone.now().year:
+        raise ValidationError('Год выхода не может быть больше текущего года.')
