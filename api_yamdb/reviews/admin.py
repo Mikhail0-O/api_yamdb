@@ -7,7 +7,7 @@ from .models import Category, Comment, Genre, Title, Review
 class TitlesAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'name', 'year', 'description', 'category',
-        'average_rating', 'Genre'
+        'average_rating', 'genre_list'
     )
     search_fields = ('name', 'year', 'category__name')
     list_filter = ('year', 'category', 'genre')
@@ -28,10 +28,10 @@ class TitlesAdmin(admin.ModelAdmin):
     average_rating.short_description = 'Average Rating'
     average_rating.admin_order_field = 'average_rating'
 
-    def Genre(self, obj):
-        return ", ".join([genre.name for genre in obj.genre.all()])
+    def genre_list(self, obj):
+        return ", ".join(obj.genre.values_list('name', flat=True))
 
-    Genre.short_description = 'Genre'
+    genre_list.short_description = 'Genre'
 
 
 class CommentAdmin(admin.ModelAdmin):
