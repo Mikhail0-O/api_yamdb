@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Avg
 from rest_framework import filters, mixins, viewsets
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
@@ -54,7 +55,7 @@ class GenreViewSet(mixins.ListModelMixin,
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitlesSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)

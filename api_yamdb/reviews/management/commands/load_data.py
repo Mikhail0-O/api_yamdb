@@ -4,7 +4,7 @@ import csv
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from reviews.models import Title, Genres, Categories, Review, Comments
+from reviews.models import Title, Genre, Category, Review, Comment
 from users.models import CustomUser
 
 
@@ -51,7 +51,7 @@ class Command(BaseCommand):
         with open(file_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                Categories.objects.get_or_create(
+                Category.objects.get_or_create(
                     id=int(row['id']),
                     name=row['name'],
                     slug=row['slug']
@@ -61,7 +61,7 @@ class Command(BaseCommand):
         with open(file_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                Genres.objects.get_or_create(
+                Genre.objects.get_or_create(
                     id=int(row['id']),
                     name=row['name'],
                     slug=row['slug']
@@ -71,7 +71,7 @@ class Command(BaseCommand):
         with open(file_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                category = Categories.objects.get(id=int(row['category']))
+                category = Category.objects.get(id=int(row['category']))
                 title = Title.objects.create(
                     id=int(row['id']),
                     name=row['name'],
@@ -81,7 +81,7 @@ class Command(BaseCommand):
                 )
                 genres = row['genre'].split('|') if 'genre' in row else []
                 for genre_name in genres:
-                    genre = Genres.objects.get(slug=genre_name)
+                    genre = Genre.objects.get(slug=genre_name)
                     title.genre.add(genre)
 
     def load_genre_titles(self, file_path):
@@ -89,7 +89,7 @@ class Command(BaseCommand):
             reader = csv.DictReader(csvfile)
             for row in reader:
                 title = Title.objects.get(id=int(row['title_id']))
-                genre = Genres.objects.get(id=int(row['genre_id']))
+                genre = Genre.objects.get(id=int(row['genre_id']))
                 title.genre.add(genre)
 
     def load_users(self, file_path):
@@ -127,7 +127,7 @@ class Command(BaseCommand):
             for row in reader:
                 review = Review.objects.get(id=int(row['review_id']))
                 user = CustomUser.objects.get(id=int(row['author']))
-                Comments.objects.create(
+                Comment.objects.create(
                     id=int(row['id']),
                     review=review,
                     text=row['text'],

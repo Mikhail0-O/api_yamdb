@@ -58,7 +58,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class TitlesSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=256)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.FloatField(read_only=True)
     genre = serializers.SlugRelatedField(
         many=True,
         slug_field='slug',
@@ -71,12 +71,6 @@ class TitlesSerializer(serializers.ModelSerializer):
     )
     reviews = ReviewsSerializer(many=True, read_only=True)
     Comment = CommentSerializer(many=True, read_only=True)
-
-    def get_rating(self, obj):
-        reviews = obj.reviews.all()
-        if reviews.exists():
-            return reviews.aggregate(Avg('score'))['score__avg']
-        return None
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
