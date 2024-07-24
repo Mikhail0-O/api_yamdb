@@ -167,6 +167,6 @@ YaMDb — это проект, который собирает отзывы по
 - Администратор: имеет полный контроль над содержимым, категориями и жанрами.
 
 **Состав команды**
-- Михаил Жуков Mikhail0-O, e-mail:
+- Михаил Жуков Mikhail0-O, e-mail: M-kh-l.i-ai-O@yandex.ru
 - Илья Прыжников ILYA PRYZHYKAU, e-mail: tuarone@gmail.com
 - Киржаков Михаил MihailKirzhakov, e-mail: kirzhakovma@mail.ru
