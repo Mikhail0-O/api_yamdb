@@ -30,3 +30,8 @@ class IsAdminOrReadOnly(permissions.BasePermission):
             or (request.user.is_authenticated
                 and request.user.role == settings.ROLE_ADMIN)
         )
+
+
+class IsAdminOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
