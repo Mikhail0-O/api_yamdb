@@ -16,9 +16,9 @@ class IsAdminAuthorModeratorOrReadOnly(permissions.BasePermission):
 
         if request.method in ('PATCH', 'DELETE'):
             return (
-                    request.user.role in (settings.ROLE_MODERATOR,
-                                          settings.ROLE_ADMIN)
-                    or obj.author == request.user
+                request.user.role in (settings.ROLE_MODERATOR,
+                                      settings.ROLE_ADMIN)
+                or obj.author == request.user
             )
         return False
 
