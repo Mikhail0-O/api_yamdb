@@ -1,55 +1,53 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Avg
 from rest_framework import filters, mixins, viewsets
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 from rest_framework import status
 
 from .mixins import GetTitleMixin, GetReviewMixin
-from reviews.models import Categories, Comments, Genres, Review, Title
-from .serializers import (CategoriesSerializer,
-                          CommentsSerializer,
-                          GenresSerializer,
+from reviews.models import Category, Comment, Genre, Review, Title
+from .serializers import (CategorySerializer,
+                          CommentSerializer,
+                          GenreSerializer,
                           TitlesSerializer,
                           ReviewsSerializer)
 from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly
 from .filters import TitlesFilter
 
 
-class CategoriesViewSet(mixins.ListModelMixin,
+class CategoryViewSet(mixins.ListModelMixin,
                         mixins.CreateModelMixin,
                         mixins.DestroyModelMixin,
                         viewsets.GenericViewSet):
-    queryset = Categories.objects.all()
-    serializer_class = CategoriesSerializer
-    pagination_class = LimitOffsetPagination
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     permission_classes = [IsAdminOrReadOnly]
 
     def get_object(self):
-        return get_object_or_404(Categories, slug=self.kwargs.get('slug'))
+        return get_object_or_404(Category, slug=self.kwargs.get('slug'))
 
     def destroy(self, request, *args, **kwargs):
         self.perform_destroy(self.get_object())
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class GenresViewSet(mixins.ListModelMixin,
+class GenreViewSet(mixins.ListModelMixin,
                     mixins.CreateModelMixin,
                     mixins.DestroyModelMixin,
                     viewsets.GenericViewSet
                     ):
-    queryset = Genres.objects.all()
-    serializer_class = GenresSerializer
-    pagination_class = LimitOffsetPagination
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     permission_classes = [IsAdminOrReadOnly]
 
     def get_object(self):
-        return get_object_or_404(Genres, slug=self.kwargs.get('slug'))
+        return get_object_or_404(Genre, slug=self.kwargs.get('slug'))
 
     def destroy(self, request, *args, **kwargs):
         self.perform_destroy(self.get_object())
@@ -57,9 +55,8 @@ class GenresViewSet(mixins.ListModelMixin,
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitlesSerializer
-    pagination_class = LimitOffsetPagination
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('name', 'year', 'genre__name', 'category__name')
@@ -85,12 +82,12 @@ class ReviewsViewSet(GetTitleMixin, viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
 
-class CommentsViewSet(GetReviewMixin, viewsets.ModelViewSet):
-    serializer_class = CommentsSerializer
+class CommentViewSet(GetReviewMixin, viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
     permission_classes = [IsAdminAuthorModeratorOrReadOnly]
 
     def get_queryset(self):
-        return Comments.objects.filter(review=self.get_review())
+        return Comment.objects.filter(review=self.get_review())
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, review=self.get_review())

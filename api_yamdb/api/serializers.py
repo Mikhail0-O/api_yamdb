@@ -1,20 +1,20 @@
 from django.db.models import Avg
 from rest_framework import serializers
 
-from reviews.models import Categories, Comments, Genres, Review, Title
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
-class CategoriesSerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Categories
+        model = Category
         fields = ('name', 'slug')
 
 
-class GenresSerializer(serializers.ModelSerializer):
+class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Genres
+        model = Genre
         fields = ('name', 'slug')
 
 
@@ -45,44 +45,38 @@ class ReviewsSerializer(serializers.ModelSerializer):
         return data
 
 
-class CommentsSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     author = serializers.CharField(
         source='author.username',
         read_only=True
     )
 
     class Meta:
-        model = Comments
+        model = Comment
         fields = ('id', 'text', 'author', 'review', 'pub_date')
 
 
 class TitlesSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=256)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.FloatField(read_only=True)
     genre = serializers.SlugRelatedField(
         many=True,
         slug_field='slug',
-        queryset=Genres.objects.all()
+        queryset=Genre.objects.all()
     )
 
     category = serializers.SlugRelatedField(
         slug_field='slug',
-        queryset=Categories.objects.all()
+        queryset=Category.objects.all()
     )
     reviews = ReviewsSerializer(many=True, read_only=True)
-    comments = CommentsSerializer(many=True, read_only=True)
-
-    def get_rating(self, obj):
-        reviews = obj.reviews.all()
-        if reviews.exists():
-            return reviews.aggregate(Avg('score'))['score__avg']
-        return None
+    Comment = CommentSerializer(many=True, read_only=True)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['category'] = CategoriesSerializer(
+        representation['category'] = CategorySerializer(
             instance.category).data
-        representation['genre'] = GenresSerializer(
+        representation['genre'] = GenreSerializer(
             instance.genre, many=True).data
         return representation
 
@@ -90,5 +84,5 @@ class TitlesSerializer(serializers.ModelSerializer):
         model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description',
-            'genre', 'category', 'reviews', 'comments'
+            'genre', 'category', 'reviews', 'Comment'
         )

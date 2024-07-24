@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from rest_framework import permissions
 
 
@@ -5,29 +7,26 @@ class IsAdminAuthorModeratorOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
-            or (request.method == 'POST' and request.user.is_authenticated)
-            or (request.method == 'PATCH' and request.user.is_authenticated)
-            or (request.method == 'PUT' and request.user.is_authenticated)
-            or (request.method == 'DELETE' and request.user.is_authenticated)
+            or request.user.is_authenticated
         )
 
     def has_object_permission(self, request, view, obj):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or (request.method == 'PATCH'
-                and (request.user.role == 'moderator'
-                     or request.user.role == 'admin'
-                     or obj.author == request.user))
-            or (request.method == 'DELETE'
-                and (request.user.role == 'moderator'
-                     or request.user.role == 'admin'
-                     or obj.author == request.user))
-        )
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        if request.method in ('PATCH', 'DELETE'):
+            return (
+                    request.user.role in (settings.ROLE_MODERATOR,
+                                          settings.ROLE_ADMIN)
+                    or obj.author == request.user
+            )
+        return False
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
-            or (request.user.is_authenticated and request.user.role == 'admin')
+            or (request.user.is_authenticated
+                and request.user.role == settings.ROLE_ADMIN)
         )
