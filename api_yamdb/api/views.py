@@ -13,7 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from api_yamdb.settings import ADMIN_EMAIL
 from .filters import TitlesFilter
-from .mixins import GetTitleMixin, GetReviewMixin
+from .mixins import GetTitleMixin, GetReviewMixin, UpdateMethodMixin
 from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly
 from reviews.models import Category, Comment, Genre, Review, Title
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -64,7 +64,7 @@ class GenreViewSet(mixins.ListModelMixin,
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TitlesViewSet(viewsets.ModelViewSet):
+class TitlesViewSet(UpdateMethodMixin, viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitlesSerializer
     permission_classes = [IsAdminOrReadOnly]
@@ -72,13 +72,8 @@ class TitlesViewSet(viewsets.ModelViewSet):
     search_fields = ('name', 'year', 'genre__name', 'category__name')
     filterset_class = TitlesFilter
 
-    def update(self, request, *args, **kwargs):
-        if request.method == 'PUT':
-            raise MethodNotAllowed('PUT')
-        return super().update(request, *args, **kwargs)
 
-
-class ReviewsViewSet(GetTitleMixin, viewsets.ModelViewSet):
+class ReviewsViewSet(GetTitleMixin, UpdateMethodMixin, viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewsSerializer
     permission_classes = [IsAdminAuthorModeratorOrReadOnly]
@@ -86,13 +81,8 @@ class ReviewsViewSet(GetTitleMixin, viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, title=self.get_title())
 
-    def update(self, request, *args, **kwargs):
-        if request.method == 'PUT':
-            raise MethodNotAllowed('PUT')
-        return super().update(request, *args, **kwargs)
 
-
-class CommentViewSet(GetReviewMixin, viewsets.ModelViewSet):
+class CommentViewSet(GetReviewMixin, UpdateMethodMixin, viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [IsAdminAuthorModeratorOrReadOnly]
 
@@ -101,11 +91,6 @@ class CommentViewSet(GetReviewMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, review=self.get_review())
-
-    def update(self, request, *args, **kwargs):
-        if request.method == 'PUT':
-            raise MethodNotAllowed('PUT')
-        return super().update(request, *args, **kwargs)
 
 
 class UserRegistrationViewSet(ModelViewSet):
@@ -136,7 +121,7 @@ class UserRegistrationViewSet(ModelViewSet):
         )
 
 
-class UserViewSet(ModelViewSet):
+class UserViewSet(UpdateMethodMixin, ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = LimitOffsetPagination
@@ -190,11 +175,6 @@ class UserViewSet(ModelViewSet):
         if request.user.role == 'user' or request.user.role == 'moderator':
             return Response(status=status.HTTP_403_FORBIDDEN)
         return super().partial_update(request, *args, **kwargs)
-
-    def update(self, request, *args, **kwargs):
-        if request.method == 'PUT':
-            raise MethodNotAllowed('PUT')
-        return super().update(request, *args, **kwargs)
 
     @action(detail=False, methods=['get', 'patch'],
             permission_classes=[IsAuthenticated])
