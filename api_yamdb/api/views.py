@@ -13,8 +13,9 @@ from rest_framework.viewsets import ModelViewSet
 from api_yamdb.settings import ADMIN_EMAIL
 from .filters import TitlesFilter
 from .mixins import (GetTitleMixin, GetReviewMixin, UpdateMethodMixin,
-                     IsAdminOrReadOnlyMixin)
-from .permissions import (IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly,
+                     IsAdminAuthorModeratorOrReadOnlyMixin,
+                     IsAdminOrReadOnlyMixin,)
+from .permissions import (IsAdminAuthorModeratorOrReadOnly,
                           IsAdmin)
 from reviews.models import Category, Comment, Genre, Review, Title
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -74,18 +75,20 @@ class TitlesViewSet(UpdateMethodMixin, IsAdminOrReadOnlyMixin,
     filterset_class = TitlesFilter
 
 
-class ReviewsViewSet(GetTitleMixin, UpdateMethodMixin, viewsets.ModelViewSet):
+class ReviewsViewSet(GetTitleMixin, UpdateMethodMixin,
+                     IsAdminAuthorModeratorOrReadOnlyMixin,
+                     viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewsSerializer
-    permission_classes = [IsAdminAuthorModeratorOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, title=self.get_title())
 
 
-class CommentViewSet(GetReviewMixin, UpdateMethodMixin, viewsets.ModelViewSet):
+class CommentViewSet(GetReviewMixin, UpdateMethodMixin,
+                     IsAdminAuthorModeratorOrReadOnlyMixin,
+                     viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAdminAuthorModeratorOrReadOnly]
 
     def get_queryset(self):
         return Comment.objects.filter(review=self.get_review())

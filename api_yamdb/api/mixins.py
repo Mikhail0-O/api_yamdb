@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import MethodNotAllowed
 
 from reviews.models import Review, Title
-from .permissions import IsAdminOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly
 
 
 class GetTitleMixin:
@@ -24,3 +24,7 @@ class UpdateMethodMixin:
 
 class IsAdminOrReadOnlyMixin:
     permission_classes = [IsAdminOrReadOnly]
+
+
+class IsAdminAuthorModeratorOrReadOnlyMixin:
+    permission_classes = [IsAdminAuthorModeratorOrReadOnly]
