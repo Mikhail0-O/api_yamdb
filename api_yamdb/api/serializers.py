@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 import re
 
-from api_yamdb.settings import VALID_USERNAME_CHARECTERS
+from api_yamdb.settings import VALID_USERNAME_CHARACTERS
 from users.confirmation_code import get_confirmation_code
 from .exceptions import CustomValidation
 from reviews.models import Category, Comment, Genre, Review, Title
@@ -120,7 +120,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = ('email', 'username',)
 
     def validate_username(self, value):
-        pattern = re.compile(VALID_USERNAME_CHARECTERS)
+        pattern = re.compile(VALID_USERNAME_CHARACTERS)
         if not pattern.match(value):
             raise serializers.ValidationError(
                 'Имя пользователя должно содержать только буквы, '
