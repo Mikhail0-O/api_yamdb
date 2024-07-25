@@ -5,7 +5,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action, api_view
-from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -14,7 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 from api_yamdb.settings import ADMIN_EMAIL
 from .filters import TitlesFilter
 from .mixins import GetTitleMixin, GetReviewMixin, UpdateMethodMixin
-from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly, IsAdmin
 from reviews.models import Category, Comment, Genre, Review, Title
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, TitlesSerializer,
