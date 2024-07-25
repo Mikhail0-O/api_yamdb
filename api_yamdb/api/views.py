@@ -14,9 +14,8 @@ from api_yamdb.settings import ADMIN_EMAIL
 from .filters import TitlesFilter
 from .mixins import (GetTitleMixin, GetReviewMixin, UpdateMethodMixin,
                      IsAdminAuthorModeratorOrReadOnlyMixin,
-                     IsAdminOrReadOnlyMixin,)
-from .permissions import (IsAdminAuthorModeratorOrReadOnly,
-                          IsAdmin)
+                     IsAdminOrReadOnlyMixin)
+from .permissions import IsAdmin
 from reviews.models import Category, Comment, Genre, Review, Title
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, TitlesSerializer,
