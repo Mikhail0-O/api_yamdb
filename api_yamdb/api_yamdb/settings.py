@@ -163,3 +163,4 @@ MAX_SCORE_VALUE = 10
 
 ROLE_MODERATOR = 'moderator'
 ROLE_ADMIN = 'admin'
+ROLE_USER = 'user'

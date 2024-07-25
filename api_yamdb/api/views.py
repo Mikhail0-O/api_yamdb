@@ -22,7 +22,7 @@ from .serializers import (CategorySerializer,
                           GenreSerializer,
                           TitlesSerializer,
                           ReviewsSerializer)
-from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly, IsAdmin
 from .filters import TitlesFilter
 from .serializers import (UserRegistrationSerializer,
                           UserSerializer, UserMeSerializer, TokenSerializer)
@@ -119,14 +119,15 @@ class UserRegistrationViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
 
+    def perform_create(self, serializer):
+        user = serializer.save()
+        self.send_confirmation_email(user.username, user.email)
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        self.send_confirmation_email(
-            serializer.data['username'], serializer.data['email']
-        )
         return Response(
             serializer.data, status=status.HTTP_200_OK, headers=headers
         )
@@ -151,52 +152,7 @@ class UserViewSet(ModelViewSet):
     search_fields = ('^username',)
     lookup_field = 'username'
     lookup_url_kwarg = 'username'
-
-    def get_permissions(self):
-        if self.action in ['create', 'signup']:
-            permission_classes = [AllowAny]
-        elif (self.action
-                in ['list', 'retrieve', 'destroy', 'partial_update', 'me']):
-            permission_classes = [IsAuthenticated]
-        else:
-            permission_classes = [IsAuthenticated]
-        return [permission() for permission in permission_classes]
-
-    def list(self, request, *args, **kwargs):
-        if request.user.is_superuser or request.user.role == 'admin':
-            queryset = self.filter_queryset(self.get_queryset())
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data)
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-    def retrieve(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        if request.user.is_superuser or request.user.role == 'admin':
-            instance = self.get_object()
-            serializer = self.get_serializer(instance)
-            return Response(serializer.data)
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-    def destroy(self, request, *args, **kwargs):
-        if request.user.is_authenticated and (
-                request.user.is_superuser or request.user.role == 'admin'):
-            try:
-                instance = self.get_object()
-                self.perform_destroy(instance)
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            except User.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-    def partial_update(self, request, *args, **kwargs):
-        if request.user.role == 'user' or request.user.role == 'moderator':
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        return super().partial_update(request, *args, **kwargs)
+    permission_classes = [IsAdmin]
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':
@@ -222,12 +178,9 @@ class UserViewSet(ModelViewSet):
 def get_token(request):
     serializer = TokenSerializer(data=request.data)
 
-    if serializer.is_valid(raise_exception=True):
-        user = User.objects.filter(
-            username=request.data.get('username')
-        ).first()
-        tokens = get_tokens_for_user(user)
-        return Response(tokens, status=status.HTTP_200_OK)
-
-    errors = serializer.errors
-    return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer.is_valid(raise_exception=True)
+    user = User.objects.filter(
+        username=request.serializer.validated_data.get('username')
+    ).first()
+    tokens = get_tokens_for_user(user)
+    return Response(tokens, status=status.HTTP_200_OK)
