@@ -106,6 +106,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserMeSerializer(UserSerializer):
+
     class Meta(UserSerializer.Meta):
         read_only_fields = ('role',)
 
