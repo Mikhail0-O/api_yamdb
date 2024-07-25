@@ -78,7 +78,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all()
     )
     reviews = ReviewsSerializer(many=True, read_only=True)
-    Comment = CommentSerializer(many=True, read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -92,7 +92,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description',
-            'genre', 'category', 'reviews', 'Comment'
+            'genre', 'category', 'reviews', 'comments'
         )
 
 
