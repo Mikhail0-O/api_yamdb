@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator, MinLengthValidator
 
+from api_yamdb.settings import VALID_USERNAME_CHARACTERS
 from .validators import validate_role, validate_username
 
 
@@ -10,7 +11,7 @@ class CustomUser(AbstractUser):
         'username', max_length=150, unique=True,
         validators=[validate_username,
                     MinLengthValidator(limit_value=5),
-                    RegexValidator(regex=r'^[\w.@+-]+\Z')]
+                    RegexValidator(regex=VALID_USERNAME_CHARACTERS)]
     )
     email = models.EmailField(
         'email',

@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 import re
 
-from api_yamdb.settings import VALID_USERNAME_CHARECTERS
+from api_yamdb.settings import VALID_USERNAME_CHARACTERS
 from users.confirmation_code import get_confirmation_code
 from .exceptions import CustomValidation
 from reviews.models import Category, Comment, Genre, Review, Title
@@ -78,7 +78,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all()
     )
     reviews = ReviewsSerializer(many=True, read_only=True)
-    Comment = CommentSerializer(many=True, read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -92,7 +92,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description',
-            'genre', 'category', 'reviews', 'Comment'
+            'genre', 'category', 'reviews', 'comments'
         )
 
 
@@ -106,6 +106,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserMeSerializer(UserSerializer):
+
     class Meta(UserSerializer.Meta):
         read_only_fields = ('role',)
 
@@ -119,7 +120,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = ('email', 'username',)
 
     def validate_username(self, value):
-        pattern = re.compile(VALID_USERNAME_CHARECTERS)
+        pattern = re.compile(VALID_USERNAME_CHARACTERS)
         if not pattern.match(value):
             raise serializers.ValidationError(
                 'Имя пользователя должно содержать только буквы, '

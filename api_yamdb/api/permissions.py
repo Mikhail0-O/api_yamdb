@@ -1,5 +1,4 @@
 from django.conf import settings
-
 from rest_framework import permissions
 
 
@@ -32,6 +31,10 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         )
 
 
-class IsAdminOnly(permissions.BasePermission):
+class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated
+        return (
+            request.user.is_authenticated
+            and (request.user.role == settings.ROLE_ADMIN
+                 or request.user.is_superuser)
+        )

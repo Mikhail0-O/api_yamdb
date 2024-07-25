@@ -153,13 +153,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 
 MIN_SCORE_VALUE = 1
-
-MAX_SCORE_VALUE = 11
-
-VALID_USERNAME_CHARECTERS = r'^[\w.@+-]+\Z'
-ADMIN_EMAIL = 'from@example.com'
-
 MAX_SCORE_VALUE = 10
+
+VALID_USERNAME_CHARACTERS = r'^[\w.@+-]+\Z'
+ADMIN_EMAIL = 'from@example.com'
 
 ROLE_MODERATOR = 'moderator'
 ROLE_ADMIN = 'admin'
+ROLE_USER = 'user'
+
+TIMEOUT_CONFIRMATION_CODE = 3600
