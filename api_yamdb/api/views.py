@@ -12,8 +12,10 @@ from rest_framework.viewsets import ModelViewSet
 
 from api_yamdb.settings import ADMIN_EMAIL
 from .filters import TitlesFilter
-from .mixins import GetTitleMixin, GetReviewMixin, UpdateMethodMixin
-from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly, IsAdmin
+from .mixins import (GetTitleMixin, GetReviewMixin, UpdateMethodMixin,
+                     IsAdminOrReadOnlyMixin)
+from .permissions import (IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly,
+                          IsAdmin)
 from reviews.models import Category, Comment, Genre, Review, Title
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, TitlesSerializer,
@@ -30,12 +32,12 @@ User = get_user_model()
 class CategoryViewSet(mixins.ListModelMixin,
                       mixins.CreateModelMixin,
                       mixins.DestroyModelMixin,
+                      IsAdminOrReadOnlyMixin,
                       viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    permission_classes = [IsAdminOrReadOnly]
 
     def get_object(self):
         return get_object_or_404(Category, slug=self.kwargs.get('slug'))
@@ -48,12 +50,12 @@ class CategoryViewSet(mixins.ListModelMixin,
 class GenreViewSet(mixins.ListModelMixin,
                    mixins.CreateModelMixin,
                    mixins.DestroyModelMixin,
+                   IsAdminOrReadOnlyMixin,
                    viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    permission_classes = [IsAdminOrReadOnly]
 
     def get_object(self):
         return get_object_or_404(Genre, slug=self.kwargs.get('slug'))
@@ -63,10 +65,10 @@ class GenreViewSet(mixins.ListModelMixin,
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TitlesViewSet(UpdateMethodMixin, viewsets.ModelViewSet):
+class TitlesViewSet(UpdateMethodMixin, IsAdminOrReadOnlyMixin,
+                    viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitlesSerializer
-    permission_classes = [IsAdminOrReadOnly]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('name', 'year', 'genre__name', 'category__name')
     filterset_class = TitlesFilter
