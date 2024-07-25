@@ -6,7 +6,7 @@ from users.models import CustomUser
 from api.validators import year_validator
 
 
-class BaseModel(models.Model):
+class NameSlugModel(models.Model):
     name = models.CharField('Название', max_length=256)
     slug = models.SlugField('Идентификатор', max_length=50, unique=True)
 
@@ -17,14 +17,14 @@ class BaseModel(models.Model):
         return self.name
 
 
-class Category(BaseModel):
+class Category(NameSlugModel):
     class Meta:
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
         ordering = ['id']
 
 
-class Genre(BaseModel):
+class Genre(NameSlugModel):
     class Meta:
         verbose_name = 'жанр'
         verbose_name_plural = 'Жанры'
