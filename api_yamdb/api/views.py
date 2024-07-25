@@ -1,35 +1,28 @@
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg
-from rest_framework import filters, mixins, viewsets
-from rest_framework.exceptions import MethodNotAllowed
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.response import Response
-from rest_framework.pagination import LimitOffsetPagination
-from rest_framework import status, filters
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import MethodNotAllowed
-from django.contrib.auth import get_user_model
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
 from api_yamdb.settings import ADMIN_EMAIL
-from .mixins import GetTitleMixin, GetReviewMixin
-from reviews.models import Category, Comment, Genre, Review, Title
-from .serializers import (CategorySerializer,
-                          CommentSerializer,
-                          GenreSerializer,
-                          TitlesSerializer,
-                          ReviewsSerializer)
-from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly
 from .filters import TitlesFilter
-from .serializers import (UserRegistrationSerializer,
+from .mixins import GetTitleMixin, GetReviewMixin
+from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly
+from reviews.models import Category, Comment, Genre, Review, Title
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, TitlesSerializer,
+                          ReviewsSerializer, UserRegistrationSerializer,
                           UserSerializer, UserMeSerializer, TokenSerializer)
 from users.get_tokens_for_user import get_tokens_for_user
 from users.confirmation_code import (generate_confirmation_code,
                                      store_confirmation_code)
-from django.core.mail import send_mail
 
 
 User = get_user_model()
