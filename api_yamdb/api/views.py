@@ -105,13 +105,9 @@ class UserRegistrationViewSet(ModelViewSet):
         self.send_confirmation_email(user.username, user.email)
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_200_OK, headers=headers
-        )
+        response = super().create(request, *args, **kwargs)
+        response.status_code = status.HTTP_200_OK
+        return response
 
     def send_confirmation_email(self, username, email):
         confirmation_code = generate_confirmation_code()
@@ -156,7 +152,7 @@ def get_token(request):
 
     serializer.is_valid(raise_exception=True)
     user = User.objects.filter(
-        username=request.serializer.validated_data.get('username')
+        username=serializer.validated_data.get('username')
     ).first()
     tokens = get_tokens_for_user(user)
     return Response(tokens, status=status.HTTP_200_OK)
