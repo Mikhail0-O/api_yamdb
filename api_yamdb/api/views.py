@@ -14,7 +14,7 @@ from api_yamdb.settings import ADMIN_EMAIL
 from .filters import TitlesFilter
 from .mixins import (GetTitleMixin, GetReviewMixin, UpdateMethodMixin,
                      IsAdminAuthorModeratorOrReadOnlyMixin,
-                     IsAdminOrReadOnlyMixin)
+                     IsAdminOrReadOnlyMixin, SearchFilterMixin)
 from .permissions import IsAdmin
 from reviews.models import Category, Comment, Genre, Review, Title
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -33,10 +33,10 @@ class CategoryViewSet(mixins.ListModelMixin,
                       mixins.CreateModelMixin,
                       mixins.DestroyModelMixin,
                       IsAdminOrReadOnlyMixin,
+                      SearchFilterMixin,
                       viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
     def get_object(self):
@@ -51,10 +51,10 @@ class GenreViewSet(mixins.ListModelMixin,
                    mixins.CreateModelMixin,
                    mixins.DestroyModelMixin,
                    IsAdminOrReadOnlyMixin,
+                   SearchFilterMixin,
                    viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
     def get_object(self):
@@ -105,13 +105,9 @@ class UserRegistrationViewSet(ModelViewSet):
         self.send_confirmation_email(user.username, user.email)
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_200_OK, headers=headers
-        )
+        response = super().create(request, *args, **kwargs)
+        response.status_code = status.HTTP_200_OK
+        return response
 
     def send_confirmation_email(self, username, email):
         confirmation_code = generate_confirmation_code()
@@ -125,11 +121,10 @@ class UserRegistrationViewSet(ModelViewSet):
         )
 
 
-class UserViewSet(UpdateMethodMixin, ModelViewSet):
+class UserViewSet(UpdateMethodMixin, SearchFilterMixin, ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
     search_fields = ('^username',)
     lookup_field = 'username'
     lookup_url_kwarg = 'username'
@@ -156,7 +151,7 @@ def get_token(request):
 
     serializer.is_valid(raise_exception=True)
     user = User.objects.filter(
-        username=request.serializer.validated_data.get('username')
+        username=serializer.validated_data.get('username')
     ).first()
     tokens = get_tokens_for_user(user)
     return Response(tokens, status=status.HTTP_200_OK)
