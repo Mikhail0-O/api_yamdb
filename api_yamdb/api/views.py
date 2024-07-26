@@ -14,7 +14,7 @@ from api_yamdb.settings import ADMIN_EMAIL
 from .filters import TitlesFilter
 from .mixins import (GetTitleMixin, GetReviewMixin, UpdateMethodMixin,
                      IsAdminAuthorModeratorOrReadOnlyMixin,
-                     IsAdminOrReadOnlyMixin)
+                     IsAdminOrReadOnlyMixin, SearchFilterMixin)
 from .permissions import IsAdmin
 from reviews.models import Category, Comment, Genre, Review, Title
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -33,10 +33,10 @@ class CategoryViewSet(mixins.ListModelMixin,
                       mixins.CreateModelMixin,
                       mixins.DestroyModelMixin,
                       IsAdminOrReadOnlyMixin,
+                      SearchFilterMixin,
                       viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
     def get_object(self):
@@ -51,10 +51,10 @@ class GenreViewSet(mixins.ListModelMixin,
                    mixins.CreateModelMixin,
                    mixins.DestroyModelMixin,
                    IsAdminOrReadOnlyMixin,
+                   SearchFilterMixin,
                    viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
     def get_object(self):

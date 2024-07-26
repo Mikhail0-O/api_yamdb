@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework import filters
 
 from reviews.models import Review, Title
 from .permissions import IsAdminOrReadOnly, IsAdminAuthorModeratorOrReadOnly
@@ -28,3 +29,7 @@ class IsAdminOrReadOnlyMixin:
 
 class IsAdminAuthorModeratorOrReadOnlyMixin:
     permission_classes = [IsAdminAuthorModeratorOrReadOnly]
+
+
+class SearchFilterMixin:
+    filter_backends = (filters.SearchFilter,)
