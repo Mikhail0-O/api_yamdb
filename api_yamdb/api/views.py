@@ -121,11 +121,10 @@ class UserRegistrationViewSet(ModelViewSet):
         )
 
 
-class UserViewSet(UpdateMethodMixin, ModelViewSet):
+class UserViewSet(UpdateMethodMixin, SearchFilterMixin, ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
     search_fields = ('^username',)
     lookup_field = 'username'
     lookup_url_kwarg = 'username'
